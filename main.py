@@ -17,7 +17,7 @@ print("Press Q to exit")
 
 
 def solve_sudoku(sudoku_array):
-    # test
+    # https://stackoverflow.com/questions/1697334/algorithm-for-solving-sudoku von:dominik von stack overflow
     # HIER ANJAS TEIL
     # Eingabe: Sudoku als mehrdimensionales Array (je Reihe ein Unter-Array),
     #          z.B: [[5, 3, 0, 0, 7, 0, 0, 0, 0], [6, 0, 0, 1, 9, 5, 0, 0, 0], ...]
