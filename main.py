@@ -1,184 +1,19 @@
 #!/usr/bin/env python
 
-from PIL import Image
-import pytesseract
+#from PIL import Image
+#import pytesseract
 import cv2
 import numpy as np
 from numpy.random import randint
-# from solver import solveSudoku
-import os
+#import os
 from imutils.perspective import four_point_transform
-from imutils import contours
+#from imutils import contours
 import imutils
-import sys
-from copy import deepcopy
+from sklearn import datasets
+from solver import solve_sudoku
+from digit_detector import get_digit_classifier, detect_digit
 
 print("Press Q to exit")
-
-
-def solve_sudoku(sudoku_array):
-    # https://stackoverflow.com/questions/1697334/algorithm-for-solving-sudoku von:dominik von stack overflow
-    # HIER ANJAS TEIL
-    # Eingabe: Sudoku als mehrdimensionales Array (je Reihe ein Unter-Array),
-    #          z.B: [[5, 3, 0, 0, 7, 0, 0, 0, 0], [6, 0, 0, 1, 9, 5, 0, 0, 0], ...]
-    #          die Nullen entsprechen den leeren Sudoku-Feldern
-    # Source: https://stackoverflow.com/a/35500280/3582159
-
-    def output(a):
-        sys.stdout.write(str(a))
-
-    N = gridsize
-
-    def print_field(field):
-        if not field:
-            output("No solution")
-            return
-        for i in range(N):
-            for j in range(N):
-                cell = field[i][j]
-                if cell == 0 or isinstance(cell, set):
-                    output('.')
-                else:
-                    output(cell)
-                if (j + 1) % 3 == 0 and j < 8:
-                    output(' |')
-
-                if j != 8:
-                    output(' ')
-            output('\n')
-            if (i + 1) % 3 == 0 and i < 8:
-                output("- - - + - - - + - - -\n")
-
-    def read(field):
-        """ Read field into state (replace 0 with set of possible values) """
-
-        state = deepcopy(field)
-        for i in range(N):
-            for j in range(N):
-                cell = state[i][j]
-                if cell == 0:
-                    state[i][j] = set(range(1, 10))
-
-        return state
-
-    state = read(sudoku_array)
-
-    def done(state):
-        """ Are we done? """
-
-        for row in state:
-            for cell in row:
-                if isinstance(cell, set):
-                    return False
-        return True
-
-    def propagate_step(state):
-        """ Propagate one step """
-
-        new_units = False
-
-        for i in range(N):
-            row = state[i]
-            values = set([x for x in row if not isinstance(x, set)])
-            for j in range(N):
-                if isinstance(state[i][j], set):
-                    state[i][j] -= values
-                    if len(state[i][j]) == 1:
-                        state[i][j] = state[i][j].pop()
-                        new_units = True
-                    elif len(state[i][j]) == 0:
-                        return False, None
-
-        for j in range(N):
-            column = [state[x][j] for x in range(N)]
-            values = set([x for x in column if not isinstance(x, set)])
-            for i in range(N):
-                if isinstance(state[i][j], set):
-                    state[i][j] -= values
-                    if len(state[i][j]) == 1:
-                        state[i][j] = state[i][j].pop()
-                        new_units = True
-                    elif len(state[i][j]) == 0:
-                        return False, None
-
-        for x in range(3):
-            for y in range(3):
-                values = set()
-                for i in range(3 * x, 3 * x + 3):
-                    for j in range(3 * y, 3 * y + 3):
-                        cell = state[i][j]
-                        if not isinstance(cell, set):
-                            values.add(cell)
-                for i in range(3 * x, 3 * x + 3):
-                    for j in range(3 * y, 3 * y + 3):
-                        if isinstance(state[i][j], set):
-                            state[i][j] -= values
-                            if len(state[i][j]) == 1:
-                                state[i][j] = state[i][j].pop()
-                                new_units = True
-                            elif len(state[i][j]) == 0:
-                                return False, None
-
-        return True, new_units
-
-    def propagate(state):
-        """ Propagate until we reach a fixpoint """
-        while True:
-            solvable, new_unit = propagate_step(state)
-            if not solvable:
-                return False
-            if not new_unit:
-                return True
-
-    def solve(state):
-        """ Solve sudoku """
-
-        solvable = propagate(state)
-
-        if not solvable:
-            return None
-
-        if done(state):
-            return state
-
-        for i in range(N):
-            for j in range(N):
-                cell = state[i][j]
-                if isinstance(cell, set):
-                    for value in cell:
-                        new_state = deepcopy(state)
-                        new_state[i][j] = value
-                        solved = solve(new_state)
-                        if solved is not None:
-                            return solved
-                    return None
-
-    res = solve(state)
-    print_field(res)
-    # Ausgabe: gelöstes Sudoku in der gleichen Struktur
-    if not res:
-        return sudoku_array
-    return res
-
-
-def detect_digit(frame):
-    # HIER NINAS TEIL
-    # Eingabe: Zugeschnittenes Schwarz-Weißes OpenCV Bild "frame" mit genau einer oder keiner Ziffer
-    """
-    # (works, but slow and no good detection (not all numbers)
-    filename = os.path.abspath(str("{}_"+str(row-1)+str(col-1)+".png").format(os.getpid()))
-    cv2.imwrite(filename, frame)
-    # Bei Fehler muss installiert werden: "AR-Sudoku/tesseract-ocr-setup...exe" und der Installationsordner muss zum System-Path hinzugefügt werden
-    text = pytesseract.image_to_string(Image.open(filename), config='outputbase digits')
-    # os.remove(filename)
-    print(filename, "detected:", text)
-    if text == "":
-        return 0
-    return text
-    """
-    # Ausgabe: Integer der Ziffer oder 0 wenn keine Ziffer vorhanden
-    return 4
-
 
 def processFrame(frame):
     modifiedFrame = frame.copy()
@@ -302,7 +137,7 @@ def processFrame(frame):
                 if type(squares_pos[row_nr][col_nr]) is not float:
                     x, y, w, h = squares_pos[row_nr][col_nr]
                     cutted_square = warped[y:y + h, x:x + w]
-                    sudoku[row_nr][col_nr] = detect_digit(cutted_square)
+                    sudoku[row_nr][col_nr] = detect_digit(cutted_square, classifier)
                     # debug: show border and colum nr
                     color = (randint(0, 255), randint(0, 255), randint(0, 255))
                     cv2.rectangle(thresh_draw, (x, y), (x + colw, y + rowh), color, 2)
@@ -313,9 +148,10 @@ def processFrame(frame):
 
         # TEST overwrite sudoku to test solver
         # sudoku = field
-        sudoku = [[5, 3, 0, 0, 7, 0, 0, 0, 0], [6, 0, 0, 1, 9, 5, 0, 0, 0], [0, 9, 8, 0, 0, 0, 0, 6, 0],
-                 [8, 0, 0, 0, 6, 0, 0, 0, 3], [4, 0, 0, 8, 0, 3, 0, 0, 1], [7, 0, 0, 0, 2, 0, 0, 0, 6],
-                 [0, 6, 0, 0, 0, 0, 2, 8, 0], [0, 0, 0, 4, 1, 9, 0, 0, 5], [0, 0, 0, 0, 8, 0, 0, 7, 9]]
+        print("Detected:",sudoku)
+        #sudoku = [[5, 3, 0, 0, 7, 0, 0, 0, 0], [6, 0, 0, 1, 9, 5, 0, 0, 0], [0, 9, 8, 0, 0, 0, 0, 6, 0],
+        #         [8, 0, 0, 0, 6, 0, 0, 0, 3], [4, 0, 0, 8, 0, 3, 0, 0, 1], [7, 0, 0, 0, 2, 0, 0, 0, 6],
+        #         [0, 6, 0, 0, 0, 0, 2, 8, 0], [0, 0, 0, 4, 1, 9, 0, 0, 5], [0, 0, 0, 0, 8, 0, 0, 7, 9]]
 
         """
             Solve Sudoku
@@ -337,10 +173,11 @@ def processFrame(frame):
             for col_nr in range(0, gridsize):
                 if type(squares_pos[row_nr][col_nr]) is not float:
                     x, y, w, h = squares_pos[row_nr][col_nr]
-                    if sudoku[row_nr][col_nr] == 0:
+                    if colw > 1:#quick hack #sudoku[row_nr][col_nr] == 0 or
                         # print("printing square", str(sudoku_solved[row_nr][col_nr]))
                         cv2.putText(thresh_draw, str(sudoku_solved[row_nr][col_nr]), (x + 8, y + 40),
-                                    cv2.FONT_HERSHEY_SIMPLEX, fontScale=1.5, color=(244, 255, 255), lineType=2)
+                                    cv2.FONT_HERSHEY_SIMPLEX, fontScale=(colw/36.6), color=(244, 255, 255), lineType=2)
+                        #print(colw)#1.5 #36.6 is 55*(2/3)
                 # else:
                 #    print("skipped square printing")
 
@@ -376,9 +213,13 @@ def showOutput(imgs):
 captureWebcam = True
 input_file = "examples/example_5.jpg"  # example 5 and 1 work
 process_size = 500
-useContours = True
+useContours = False
 combineOutputWindow = True
 gridsize = 9                  # 9x9 sudoku
+
+# init the digits dataset
+digits = datasets.load_digits()
+classifier = get_digit_classifier(digits)
 
 if captureWebcam:
     cap = cv2.VideoCapture(0)
