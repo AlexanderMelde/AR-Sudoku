@@ -3,7 +3,7 @@ import numpy as np
 from sklearn import svm, metrics
 
 def get_digit_classifier(digits):
-    images_and_labels = list(zip(digits.images, digits.target))
+    #modified from http://scikit-learn.org/stable/auto_examples/classification/plot_digits_classification.html
     # To apply a classifier on this data, we need to flatten the image, to
     # turn the data in a (samples, feature) matrix:
     n_samples = len(digits.images)
@@ -12,18 +12,18 @@ def get_digit_classifier(digits):
     #print("************", data[0], "************")
 
     # Create a classifier: a support vector classifier
-    classifier = svm.SVC(gamma=0.001)
+    classifier = svm.SVC(gamma=0.001, probability=True)
 
     # We learn the digits on the first half of the digits
-    classifier.fit(data[:n_samples // 2], digits.target[:n_samples // 2])
+    classifier.fit(data, digits.target)
 
     # Now predict the value of the digit on the second half:
-    expected = digits.target[n_samples // 2:]
-    predicted = classifier.predict(data[n_samples // 2:])
+    #expected = digits.target[n_samples // 2:]
+    #predicted = classifier.predict(data[n_samples // 2:])
 
-    print("Classification report for classifier %s:\n%s\n"
-          % (classifier, metrics.classification_report(expected, predicted)))
-    print("Confusion matrix:\n%s" % metrics.confusion_matrix(expected, predicted))
+    #print("Classification report for classifier %s:\n%s\n"
+    #      % (classifier, metrics.classification_report(expected, predicted)))
+    #print("Confusion matrix:\n%s" % metrics.confusion_matrix(expected, predicted))
     return classifier
 
 
@@ -43,16 +43,18 @@ def detect_digit(frame, classifier):
     frame_mini = np.array(frame_mini, np.float64)
 
     #Remove border pixels
-    frame_mini[0:1, : ] = 0
-    frame_mini[ : ,0:1] = 0
+    frame_mini[0:2, : ] = 0
+    frame_mini[ : ,0:2] = 0
 
     # now the 8x8 picture has to be flatten:
     frame_mini_flat = np.ndarray.flatten(frame_mini)
 
     #print("~~~~~~~~~~~~~~",frame_mini_flat,"~~~~~~~~~~~~~~")
-    predicted = classifier.predict([frame_mini_flat])
+    predicted_probs = classifier.predict_proba([frame_mini_flat])[0]
+    predicted_digit = np.argmax(predicted_probs)
+    predicted_digit_prob = predicted_probs[predicted_digit]
 
-    #print("Zahl:",predicted)
+    # print("Zahl:",predicted_digit,"%:",predicted_digit_prob)
 
     """
     # (works, but slow and no good detection (not all numbers)
@@ -66,5 +68,5 @@ def detect_digit(frame, classifier):
         return 0
     return text
     """
-    # Ausgabe: Integer der Ziffer oder 0 wenn keine Ziffer vorhanden
-    return predicted[0]
+    # Ausgabe: Integer der Ziffer oder 0 wenn (wahrscheinlich) keine Ziffer vorhanden
+    return predicted_digit if predicted_digit_prob > 0.2 else 0

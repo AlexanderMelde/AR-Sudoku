@@ -53,7 +53,10 @@ def processFrame(frame):
             sudoku_outline = approx
             break
 
-    if sudoku_outline is not None:
+    # print(approx, len(approx))
+    sudoku_outline_width = abs(sudoku_outline[2][0][0] - sudoku_outline[0][0][0])
+    #minimum size: 8pixel per small number field
+    if sudoku_outline is not None and sudoku_outline_width > 8*9:
         # extract the sudoku, apply a perspective transform to it
         warped = four_point_transform(modifiedFrame, sudoku_outline.reshape(4, 2))
         # warped_on_original_frame = four_point_transform(frame, sudoku_outline.reshape(4, 2))
@@ -173,9 +176,9 @@ def processFrame(frame):
             for col_nr in range(0, gridsize):
                 if type(squares_pos[row_nr][col_nr]) is not float:
                     x, y, w, h = squares_pos[row_nr][col_nr]
-                    if colw > 1:#quick hack #sudoku[row_nr][col_nr] == 0 or
+                    if colw > 1 and sudoku[row_nr][col_nr] == 0:
                         # print("printing square", str(sudoku_solved[row_nr][col_nr]))
-                        cv2.putText(thresh_draw, str(sudoku_solved[row_nr][col_nr]), (x + 8, y + 40),
+                        cv2.putText(thresh_draw, str(sudoku_solved[row_nr][col_nr]), (int(x + colw/5), int(y + rowh * 0.8)),
                                     cv2.FONT_HERSHEY_SIMPLEX, fontScale=(colw/36.6), color=(244, 255, 255), lineType=2)
                         #print(colw)#1.5 #36.6 is 55*(2/3)
                 # else:

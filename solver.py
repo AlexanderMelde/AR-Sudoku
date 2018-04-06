@@ -1,4 +1,5 @@
 import sys
+import numpy as np
 from copy import deepcopy
 
 def solve_sudoku(sudoku_array):
@@ -45,8 +46,6 @@ def solve_sudoku(sudoku_array):
                     state[i][j] = set(range(1, 10))
 
         return state
-
-    state = read(sudoku_array)
 
     def done(state):
         """ Are we done? """
@@ -138,9 +137,17 @@ def solve_sudoku(sudoku_array):
                             return solved
                     return None
 
-    res = solve(state)
-    print_field(res)
-    # Ausgabe: gelöstes Sudoku in der gleichen Struktur
-    if not res:
-        return sudoku_array
-    return res
+    print("started solving")
+    res = None
+    # do not solve sudokus with less than 15 known numbers (of 81)
+    # TODO: Solving non-real sudokus takes very long
+    if(np.count_nonzero(sudoku_array) >= 15):
+        state = read(sudoku_array)
+        res = solve(state)
+        print("solved")
+        #print_field(res)
+    else:
+        print("jumped solving")
+
+    # Ausgabe: gelöstes Sudoku in der gleichen Struktur oder wenn unlösbar: original-sudoku
+    return res if res else sudoku_array
