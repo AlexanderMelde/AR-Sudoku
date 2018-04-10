@@ -34,8 +34,24 @@ def detect_digit(frame, classifier):
     if len(frame) < 8:
         return 0
 
+
+    #Höhe/Breite bestimmen
+    height, width = frame.shape[:2]
+
+
+    #10% von w und h berechnen
+
+    x=int(0.1*width)
+    y=int(0.1*height)
+
+    #frame-Zuschnitt
+
+    frame_zuschnitt=frame[x:int(x+(width-2*x)) ,  y: int(y+(height-2*y)) ]
+
+
+
     # classifier needs an 8x8 picture with 16 greyscale steps (4 Bit) and black digits on white bg
-    frame_mini = cv2.resize(frame, (8,8))
+    frame_mini = cv2.resize(frame_zuschnitt, (8,8))
     # now we can invert the image for black digits on white
     frame_mini = cv2.bitwise_not(frame_mini)
     # currently it has 256 Steps (8 Bit). Reduce amount of steps by dividing by (256/4) and convert to float64
@@ -43,8 +59,8 @@ def detect_digit(frame, classifier):
     frame_mini = np.array(frame_mini, np.float64)
 
     #Remove border pixels
-    frame_mini[0:2, : ] = 0
-    frame_mini[ : ,0:2] = 0
+    #frame_mini[0:2, : ] = 0
+    #frame_mini[ : ,0:2] = 0
 
     # now the 8x8 picture has to be flatten:
     frame_mini_flat = np.ndarray.flatten(frame_mini)
