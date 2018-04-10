@@ -1,0 +1,86 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome file</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><h1 id="prüfungsleistung-bildverarbeitung">Prüfungsleistung Bildverarbeitung</h1>
+
+<table>
+<thead>
+<tr>
+<th>Details</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Autoren</td>
+<td>Alexander Melde (7939560)<br>Anja Ohlhäuser (6986288)<br>Nina Zaske (4627174)</td>
+</tr>
+<tr>
+<td>Betreuer</td>
+<td>Stefan Gehrig</td>
+</tr>
+<tr>
+<td>Vorlesung</td>
+<td>Digitale Bildverarbeitung (6. Semester)</td>
+</tr>
+<tr>
+<td>Studiengang/Kurs</td>
+<td>B. Sc. Angewandte Informatik – Kommunikationsinformatik TINF15K</td>
+</tr>
+<tr>
+<td>Titel der Arbeit</td>
+<td>Projekt zu Grundlagen der Bildverarbeitung: Entwicklung eines Augmented Reality Sudoku-Lösers</td>
+</tr>
+<tr>
+<td>Bearbeitungszeitraum</td>
+<td>14.03.2018 - 10.04.2018</td>
+</tr>
+<tr>
+<td>Abgabedatum</td>
+<td>11.04.2018</td>
+</tr>
+</tbody>
+</table><h3 id="aufgabe">Aufgabe</h3>
+<p>Im Rahmen einer Vorlesung sollte unter Verwendung des OpenCV Frameworks ein beliebiges Programm entwickelt werden, dass Techniken der digitalen Bildverarbeitung verwendet.</p>
+<h3 id="umsetzung">Umsetzung</h3>
+<p>Das mit Python 3 entwickelte Programm sucht im Kamerabild einer Computer-Webcam nach Sudoku-Feldern, extrahiert das Sudoku-Feld sowie jedes einzelne der 9x9 Zahlen-Felder, erkennt die Zahlen in den Feldern, löst das Sudoku und ergänzt die fehlenden Zahlen des Sudokus in Echtzeit im Kamerabild.</p>
+<h4 id="eigenanteil">Eigenanteil</h4>
+<ul>
+<li>Erkennung des Sudoku-Quadrats im Gesamtbild</li>
+<li>Aufteilung des Sudoku-Quadrats in 9x9 Felder mit zwei Versionen:
+<ul>
+<li>Erkennen der kleinen Quadrate anhand deren Konturen (Genauere Erkennung des Sudoku Felds und ermöglicht Validierung ob Quadrat ein Sudoku-Feld ist, oft werden aber nicht alle Felder erkannt.)</li>
+<li>Feste Aufteilung des 9x9 Felds mit mathematischen Rechnungen (Es werden immer 9x9 Felder „erkannt“, kann nicht zur Validierung von echten Sudoku-Feldern genutzt werden)</li>
+</ul>
+</li>
+<li>Anpassen eines Sudoku-Lösungs-Algorithmus an unsere Datenstruktur</li>
+<li>Einbinden eines Machine Learning Frameworks und Trainieren des Modells auf handschriftliche Zahlen (hierfür gab es bereits einen Datensatz)</li>
+<li>Vorbereiten der kleinen Sudoku-Bildausschnitte für die Ziffern-Klassifikation (Zuschnitt, Resizing, Farbwertumwandlung)</li>
+<li>Auswertung der Klassifikations-Antwort (Wahrscheinlichkeiten berücksichtigen um leere Felder zu unterscheiden)</li>
+<li>Anzeige der gelösten Sudoku-Ziffern im zugeschnittenen Bild und Ausgabe des Bilds</li>
+<li>Option zum Einlesen von Beispielbildern und zur Verwendung der Webcam als Eingabemöglichkeit</li>
+</ul>
+<h3 id="funktionstest">Funktionstest</h3>
+<ul>
+<li>Grundsätzlich wird die Zielsetzung für manche Bilder erreicht</li>
+<li>In das Bild gehalten Sudokus werden in den meisten Fällen korrekt erkannt</li>
+<li>Ziffern werden oft nicht korrekt erkannt, weshalb der Sudoku-Solver eine falsche Eingabe erhält und dann auch die Ausgabe nicht stimmt.</li>
+<li>In Modultests wurde die Funktionalität des Sudoku-Solvers bestätigt</li>
+</ul>
+<h3 id="weiterentwicklungsmöglichkeiten">Weiterentwicklungsmöglichkeiten</h3>
+<ul>
+<li>Einblendung des gelösten Sudokus in Original-Kamerabild (statt in Sudoku-Zuschnitt, erfordert rückrechnung der zum zugeschnittenen Sudoku relativen 9x9-Positionen zum Originialbild)</li>
+<li>Verbesserung der Ziffern-Erkennung (Datensatz mit höherer Auflösung und Computerschriftarten verwenden)</li>
+</ul>
+</div>
+</body>
+
+</html>
