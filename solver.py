@@ -1,5 +1,6 @@
 import sys
 import numpy as np
+from datetime import datetime
 from copy import deepcopy
 
 def solve_sudoku(sudoku_array):
@@ -128,6 +129,13 @@ def solve_sudoku(sudoku_array):
         for i in range(N):
             for j in range(N):
                 cell = state[i][j]
+                # Do not solve if solving takes more than 1/30secs.
+                curtime = datetime.now()
+                #print((curtime - starttime).microseconds)
+                if (curtime - starttime).microseconds > (1000000/3):
+                    print("jumped solving because took too long")
+                    return None
+
                 if isinstance(cell, set):
                     for value in cell:
                         new_state = deepcopy(state)
@@ -137,17 +145,21 @@ def solve_sudoku(sudoku_array):
                             return solved
                     return None
 
+
+    starttime = datetime.now()
     print("started solving")
     res = None
-    # do not solve sudokus with less than 15 known numbers (of 81)
-    # TODO: Solving non-real sudokus takes very long
-    if(np.count_nonzero(sudoku_array) >= 15):
+    # do not solve sudokus with less than 5 known numbers (of 81)
+    if(np.count_nonzero(sudoku_array) >= 5):
         state = read(sudoku_array)
         res = solve(state)
-        print("solved")
+        if res is not None:
+            print("solved")
+        else:
+            print("could not solve")
         #print_field(res)
     else:
-        print("jumped solving")
+        print("jumped solving because less than 5 known numbers")
 
     # Ausgabe: gelöstes Sudoku in der gleichen Struktur oder wenn unlösbar: original-sudoku
     return res if res else sudoku_array

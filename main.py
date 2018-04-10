@@ -1,13 +1,9 @@
 #!/usr/bin/env python
 
-#from PIL import Image
-#import pytesseract
 import cv2
 import numpy as np
 from numpy.random import randint
-#import os
 from imutils.perspective import four_point_transform
-#from imutils import contours
 import imutils
 from sklearn import datasets
 from solver import solve_sudoku
@@ -142,8 +138,9 @@ def processFrame(frame):
                     cutted_square = warped[y:y + h, x:x + w]
                     sudoku[row_nr][col_nr] = detect_digit(cutted_square, classifier)
                     # debug: show border and colum nr
-                    color = (randint(0, 255), randint(0, 255), randint(0, 255))
-                    cv2.rectangle(thresh_draw, (x, y), (x + colw, y + rowh), color, 2)
+                    if showGrid:
+                        color = (randint(0, 255), randint(0, 255), randint(0, 255))
+                        cv2.rectangle(thresh_draw, (x, y), (x + colw, y + rowh), color, 2)
                     # cv2.circle(thresh_draw, (x + int(colw / 2), y + int(rowh / 2)), 1, color)
                     # cv2.putText(thresh_draw, str(col_nr + 1) + str(row_nr + 1), (x + 5, y + 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color)
                 # else:
@@ -159,8 +156,8 @@ def processFrame(frame):
         """
             Solve Sudoku
         """
+        sudoku_solved = solve_sudoku(np.copy(sudoku).tolist())
 
-        sudoku_solved = solve_sudoku(sudoku)
 
         # TEST overwrite sudoku to test output print
         #sudoku_solved = [[5, 3, 4, 6, 7, 8, 9, 1, 2], [6, 7, 2, 1, 9, 5, 3, 4, 8], [1, 9, 8, 3, 4, 2, 5, 6, 7],
@@ -172,15 +169,20 @@ def processFrame(frame):
         """
         # do something for each detected square
         # print(squares_pos)
+        #if not np.array_equal(sudoku_solved, sudoku): #only print solution if solvable
         for row_nr in range(0, gridsize):
             for col_nr in range(0, gridsize):
                 if type(squares_pos[row_nr][col_nr]) is not float:
                     x, y, w, h = squares_pos[row_nr][col_nr]
                     if colw > 1 and sudoku[row_nr][col_nr] == 0:
-                        # print("printing square", str(sudoku_solved[row_nr][col_nr]))
+                        color = (255, 0, 0)
+                    else:
+                        color = (0,255,0)
+                    # print("printing square", str(sudoku_solved[row_nr][col_nr]))
+                    if sudoku_solved[row_nr][col_nr] != 0:
                         cv2.putText(thresh_draw, str(sudoku_solved[row_nr][col_nr]), (int(x + colw/5), int(y + rowh * 0.8)),
-                                    cv2.FONT_HERSHEY_SIMPLEX, fontScale=(colw/36.6), color=(244, 255, 255), lineType=2)
-                        #print(colw)#1.5 #36.6 is 55*(2/3)
+                                    cv2.FONT_HERSHEY_TRIPLEX, fontScale=(colw/36.6), color=color, lineType=2)
+                    #print(colw)#1.5 #36.6 is 55*(2/3)
                 # else:
                 #    print("skipped square printing")
 
@@ -219,6 +221,7 @@ process_size = 500
 useContours = False
 combineOutputWindow = True
 gridsize = 9                  # 9x9 sudoku
+showGrid = False
 
 # init the digits dataset
 digits = datasets.load_digits()
@@ -236,6 +239,10 @@ if captureWebcam:
         if cv2.waitKey(1) & 0xFF == ord('q'):
             cv2.destroyAllWindows()
             break
+
+        if cv2.waitKey(1) & 0xFF == ord('p'):
+            wait = input("PRESS ENTER TO CONTINUE.")
+
 
     cap.release()
     cv2.destroyAllWindows()
