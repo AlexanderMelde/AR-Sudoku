@@ -218,13 +218,13 @@ def showOutput(imgs):
 ################################
 
 # config
-captureWebcam = True
-input_file = "examples/example_5.jpg"  # example 5 and 1 work
-process_size = 500
-useContours = False
-combineOutputWindow = True
-gridsize = 9                  # 9x9 sudoku
-showGrid = True
+captureWebcam = True                    # True = Use Webcam Image, False = Use Input File
+input_file = "examples/example_5.jpg"   # Input File used when captureWebcam is set to False
+process_size = 500                      # Pixel-Size used when filtering contours (and for output)
+useContours = False                     # Set to True to detect small squares via contures or to False to divide to a 9x9 grid mathematically
+combineOutputWindow = True              # Choose if OpenCV should Display Output in seperate Windows (False) or one Window (True)
+gridsize = 9                            # Size of the Sudoku (9 for 9x9 sudokus)
+showGrid = True                         # Set to True to show detected small squares or to False to hide this (debugging) overlay
 
 # init the digits dataset
 digits = datasets.load_digits()
@@ -245,7 +245,6 @@ if captureWebcam:
 
         if cv2.waitKey(1) & 0xFF == ord('p'):
             wait = input("PRESS ENTER TO CONTINUE.")
-
 
     cap.release()
     cv2.destroyAllWindows()

@@ -31,7 +31,7 @@ def sortFunc(c):
 
     """
         Detect Squares
-
+    """
     # black color boundaries (R,B,G)
     lower = np.array([0, 0, 0], dtype="uint8")
     upper = np.array([120, 120, 120], dtype="uint8")
@@ -56,7 +56,7 @@ def sortFunc(c):
         # draw the book contour (in green)
         cv2.rectangle(output, (x, y), (x + w, y + h), (0, 255, 0), 2)
         crop_img = output[y:y + h, x:x + w]
-    """
+
 
     # ocr
     filename = os.path.abspath("{}.png".format(os.getpid()))
@@ -66,3 +66,19 @@ def sortFunc(c):
     text = pytesseract.image_to_string(Image.open(filename))
     os.remove(filename)
     print("detected:", text)
+
+
+    """
+    # ALTERNATIVE ZIFFERNERKENNUNG MIT TESSERACT
+    # =======================================================================================
+    # (works, but slow and no good detection (not all numbers)
+    filename = os.path.abspath(str("{}_"+str(row-1)+str(col-1)+".png").format(os.getpid()))
+    cv2.imwrite(filename, frame)
+    # Bei Fehler muss installiert werden: "AR-Sudoku/tesseract-ocr-setup...exe" und der Installationsordner muss zum System-Path hinzugefügt werden
+    text = pytesseract.image_to_string(Image.open(filename), config='outputbase digits')
+    # os.remove(filename)
+    print(filename, "detected:", text)
+    if text == "":
+        return 0
+    return text
+    """
