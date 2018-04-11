@@ -37,3 +37,15 @@ Das mit Python 3 entwickelte Programm sucht im Kamerabild einer Computer-Webcam 
 ### Weiterentwicklungsmöglichkeiten
 - Einblendung des gelösten Sudokus in Original-Kamerabild (statt in Sudoku-Zuschnitt, erfordert rückrechnung der zum zugeschnittenen Sudoku relativen 9x9-Positionen zum Originialbild)
 - Verbesserung der Ziffern-Erkennung (Datensatz mit höherer Auflösung und Computerschriftarten verwenden)
+
+### Entwicklungsumgebung
+Zur Entwicklung wurde die Python Version 3.6.3 unter Windows und Mac verwendetet.
+
+**Verwendete Python Module**
+- opencv-python
+- pillow
+- imutils
+- numpy
+- scipy
+- skikit-learn
+- sklearn

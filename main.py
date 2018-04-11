@@ -50,7 +50,10 @@ def processFrame(frame):
             break
 
     # print(approx, len(approx))
-    sudoku_outline_width = abs(sudoku_outline[2][0][0] - sudoku_outline[0][0][0])
+    if len(sudoku_outline) > 2:
+        sudoku_outline_width = abs(sudoku_outline[2][0][0] - sudoku_outline[0][0][0])
+    else:
+        sudoku_outline_width = 0
     #minimum size: 8pixel per small number field
     if sudoku_outline is not None and sudoku_outline_width > 8*9:
         # extract the sudoku, apply a perspective transform to it
@@ -221,7 +224,7 @@ process_size = 500
 useContours = False
 combineOutputWindow = True
 gridsize = 9                  # 9x9 sudoku
-showGrid = False
+showGrid = True
 
 # init the digits dataset
 digits = datasets.load_digits()
